@@ -7,9 +7,13 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.ram = [0] x 256
-        self.reg = [0] x 8
+        self.ram = [0] * 256
+        self.reg = [0] * 8
         self.pc = 0
+        self.ops = {}
+        self.ops[0b10000010] = 'LDI'
+        self.ops[0b01000111] = 'PRN'
+        self.ops[0b00000001] = 'HLT'
 
     def load(self):
         """Load a program into memory."""
@@ -69,4 +73,24 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        running = True
+        
+        while running:
+            ir = self.ram[self.pc]
+            ir_op = self.ops[ir]
+            operand_a = self.ram_read(self.pc + 1)
+            operand_b = self.ram_read(self.pc + 2)
+
+            self.trace()
+
+            # LDI
+            if ir_op == 'LDI':
+                self.reg[operand_a] = operand_b
+                self.pc += 3
+            # PRN
+            elif ir_op == 'PRN':
+                print(self.reg[operand_a])
+                self.pc += 2
+            # HLT
+            elif ir_op == 'HLT':
+                running = False
