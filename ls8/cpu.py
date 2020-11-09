@@ -1,5 +1,5 @@
 """CPU functionality."""
-
+import os
 import sys
 
 class CPU:
@@ -22,19 +22,27 @@ class CPU:
 
         # For now, we've just hardcoded a program:
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
+
+        with open(os.path.join(sys.path[0], sys.argv[1], 'r') as program:
+            for line in program:
+                split = line.split('#')
+                instruction = split[0].strip()
+                if instruction != '':
+                    self.ram[address] = int(instruction, 2)
+                    address += 1
 
     def ram_read(self, mar):
         return self.ram[mar]
@@ -81,7 +89,7 @@ class CPU:
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
 
-            self.trace()
+            # self.trace()
 
             # LDI
             if ir_op == 'LDI':
