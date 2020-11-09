@@ -14,6 +14,7 @@ class CPU:
         self.ops[0b10000010] = 'LDI'
         self.ops[0b01000111] = 'PRN'
         self.ops[0b00000001] = 'HLT'
+        self.ops[0b10100010] = 'MUL'
 
     def load(self):
         """Load a program into memory."""
@@ -36,7 +37,7 @@ class CPU:
         #     self.ram[address] = instruction
         #     address += 1
 
-        with open(os.path.join(sys.path[0], sys.argv[1], 'r') as program:
+        with open(os.path.join(sys.path[0], sys.argv[1]), 'r') as program:
             for line in program:
                 split = line.split('#')
                 instruction = split[0].strip()
@@ -56,6 +57,8 @@ class CPU:
         if op == "ADD":
             self.reg[reg_a] += self.reg[reg_b]
         #elif op == "SUB": etc
+        elif op == 'MUL':
+            self.reg[reg_a] *= self.reg[reg_b]
         else:
             raise Exception("Unsupported ALU operation")
 
@@ -99,6 +102,10 @@ class CPU:
             elif ir_op == 'PRN':
                 print(self.reg[operand_a])
                 self.pc += 2
+            # MUL
+            elif ir_op == 'MUL':
+                self.alu('MUL', operand_a, operand_b)
+                self.pc += 3
             # HLT
             elif ir_op == 'HLT':
                 running = False
