@@ -2,6 +2,8 @@
 import os
 import sys
 
+SP = 0x07
+
 class CPU:
     """Main CPU class."""
 
@@ -9,12 +11,16 @@ class CPU:
         """Construct a new CPU."""
         self.ram = [0] * 256
         self.reg = [0] * 8
+        self.reg[SP] = 0xf4
         self.pc = 0
         self.ops = {}
         self.ops[0b10000010] = 'LDI'
         self.ops[0b01000111] = 'PRN'
         self.ops[0b00000001] = 'HLT'
         self.ops[0b10100010] = 'MUL'
+        self.ops[0b01000101] = 'PUSH'
+        self.ops[0b01000110] = 'POP'
+        self.ops[0b10100000] = 'ADD'
 
     def load(self):
         """Load a program into memory."""
@@ -106,6 +112,20 @@ class CPU:
             elif ir_op == 'MUL':
                 self.alu('MUL', operand_a, operand_b)
                 self.pc += 3
+            # ADD
+            elif ir_op == 'ADD':
+                self.alu('ADD', operand_a, operand_b)
+                self.pc += 3
+            # PUSH
+            elif ir_op == 'PUSH':
+                self.reg[SP] -= 1
+                self.ram_write(self.reg[SP], self.reg[operand_a])
+                self.pc += 2
+            # POP
+            elif ir_op == 'POP':
+                self.reg[operand_a] = self.ram_read(self.reg[SP])
+                self.reg[SP] += 1
+                self.pc += 2
             # HLT
             elif ir_op == 'HLT':
                 running = False
